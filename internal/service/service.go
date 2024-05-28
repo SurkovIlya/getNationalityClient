@@ -40,7 +40,7 @@ func (sv *Service) Start() (string, error) {
 		if user.Name == "Владимир" {
 			user.National = "Slavic"
 			user.ID = uint32(time.Now().Unix())
-			fmt.Printf("Name: %s\nNational: Slavic\n", user.Name)
+			fmt.Printf("ID: %v\nName: %s\nNational: Slavic\n", user.ID, user.Name)
 			// return "Slavic", nil
 		} else {
 			user.National, err = sv.NationalPredicter.GetNational(user)
@@ -49,7 +49,7 @@ func (sv *Service) Start() (string, error) {
 				// return "", err
 			}
 			user.ID = uint32(time.Now().Unix())
-			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+			fmt.Printf("ID: %v\nName: %s\nNational: %s\n", user.ID, user.Name, user.National)
 
 			// return user.National, nil
 		}
