@@ -1,6 +1,9 @@
 package nationalpredict
 
-import "ezclient/internal/model"
+import (
+	"getNationalClient/internal/model"
+	"log"
+)
 
 type NationalSource interface {
 	GetNationalByName(string) (string, error)
@@ -19,7 +22,11 @@ func New(cl map[string]string, ns NationalSource) *NationalPredicter {
 }
 
 func (np *NationalPredicter) GetNational(user model.User) (string, error) {
-	//np.NationalSource.GetNatByName()
-
-	return "", nil
+	iso, err := np.NationalSource.GetNationalByName(user.Name)
+	if err != nil {
+		log.Println("GetNational error", err)
+		return "", err
+	}
+	national := np.CountryList[iso]
+	return national, nil
 }

@@ -58,11 +58,11 @@ func (np *NationalSource) GetNationalByName(name string) (string, error) {
 		return "", err
 	}
 
-	fmt.Printf("Name: %s\n", apiResponse.Name)
-	fmt.Printf("Probabilities:\n")
-	for _, country := range apiResponse.Country {
-		fmt.Printf("Country: %s, Probability: %f\n", country.CountryID, country.Probability)
-	}
+	// fmt.Printf("Name: %s\n", apiResponse.Name)
+	// fmt.Printf("Probabilities:\n")
+	// for _, country := range apiResponse.Country {
+	// 	fmt.Printf("Country: %s, Probability: %f\n", country.CountryID, country.Probability)
+	// }
 
 	return apiResponse.Country[0].CountryID, nil
 }
