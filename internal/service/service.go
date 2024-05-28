@@ -39,16 +39,16 @@ func (sv *Service) Start() (string, error) {
 		if user.Name == "Владимир" {
 			user.National = "Slavic"
 			fmt.Printf("Name: %s\nNational: Slavic\n", user.Name)
-			return "Slavic", nil
+			// return "Slavic", nil
 		} else {
 			user.National, err = sv.NationalPredicter.GetNational(user)
 			if err != nil {
 				log.Println("Error find national:", err)
-				return "", err
+				// return "", err
 			}
 			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
-			return user.National, nil
+			// return user.National, nil
 		}
 	}
 }
