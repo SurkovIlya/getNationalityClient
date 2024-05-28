@@ -6,6 +6,7 @@ import (
 	"getNationalClient/internal/nationalpredict"
 	"log"
 	"os"
+	"time"
 )
 
 // Взаимодействие с пользователем
@@ -38,6 +39,7 @@ func (sv *Service) Start() (string, error) {
 		fmt.Fscan(os.Stdin, &user.Name)
 		if user.Name == "Владимир" {
 			user.National = "Slavic"
+			user.ID = uint32(time.Now().Unix())
 			fmt.Printf("Name: %s\nNational: Slavic\n", user.Name)
 			// return "Slavic", nil
 		} else {
@@ -46,6 +48,7 @@ func (sv *Service) Start() (string, error) {
 				log.Println("Error find national:", err)
 				// return "", err
 			}
+			user.ID = uint32(time.Now().Unix())
 			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
 			// return user.National, nil
