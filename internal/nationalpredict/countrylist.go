@@ -23,10 +23,10 @@ func GetCountryList() (map[string]string, error) {
 		fmt.Println("Read error:", err)
 		return nil, err
 	}
-	var cl map[string]string
+	cl := make(map[string]string)
 
-	for i, row := range records {
-		cl[row[0]] = row[i]
+	for _, row := range records {
+		cl[row[0]] = row[1]
 	}
 	return cl, nil
 }

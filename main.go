@@ -1,8 +1,10 @@
 package main
 
 import (
-	"ezclient/internal/nationalpredict"
-	"ezclient/internal/nationalsource"
+	"getNationalClient/internal/nationalpredict"
+	"getNationalClient/internal/nationalsource"
+	"getNationalClient/internal/service"
+	"log"
 )
 
 const host = "https://api.nationalize.io"
@@ -10,9 +12,15 @@ const host = "https://api.nationalize.io"
 func main() {
 	ns := nationalsource.New(host)
 
-	np := nationalpredict.New(nil, ns)
+	cl, err := nationalpredict.GetCountryList()
+	if err != nil {
+		log.Println("CountryList error:", err)
+	}
 
-	service := service.New(np)
+	np := nationalpredict.New(cl, ns)
 
-	service.Start()
+	sv := service.New(np)
+
+	sv.Start()
+
 }
