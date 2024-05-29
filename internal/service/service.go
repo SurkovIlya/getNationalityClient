@@ -4,25 +4,20 @@ import (
 	"fmt"
 	"getNationalClient/internal/model"
 	"getNationalClient/internal/nationalpredict"
+	"getNationalClient/pkg/cache"
 	"log"
 	"os"
 	"time"
 )
 
-// Взаимодействие с пользователем
-
 type National interface {
 	GetNational(string) (string, error)
 }
-
-// Объект Сервис
 
 type Service struct {
 	National          National
 	NationalPredicter *nationalpredict.NationalPredicter
 }
-
-// New
 
 func New(np *nationalpredict.NationalPredicter) *Service {
 	return &Service{
@@ -33,7 +28,10 @@ func New(np *nationalpredict.NationalPredicter) *Service {
 
 func (sv *Service) Start() (string, error) {
 	var user model.User
-	var err error
+	// var err error
+	const ttlMs = 5
+	cacheUsers := cache.NewCash(uint32(ttlMs))
+	go cacheUsers.Clean()
 
 	for {
 		fmt.Fscan(os.Stdin, &user.Name)
@@ -43,17 +41,25 @@ func (sv *Service) Start() (string, error) {
 			fmt.Printf("ID: %v\nName: %s\nNational: Slavic\n", user.ID, user.Name)
 			// return "Slavic", nil
 		} else {
-			user.National, err = sv.NationalPredicter.GetNational(user)
+			cu, err := cacheUsers.GetUserByName(user.Name)
 			if err != nil {
-				log.Println("Error find national:", err)
-				// return "", err
-			}
-			user.ID = uint32(time.Now().Unix())
-			fmt.Printf("ID: %v\nName: %s\nNational: %s\n", user.ID, user.Name, user.National)
+				log.Println(err)
+				user.National, err = sv.NationalPredicter.GetNational(user)
+				if err != nil {
+					log.Println("Error find national:", err)
+					// return "", err
+				}
+				user.ID = uint32(time.Now().Unix())
+				cacheUsers.AddWord(user)
+				fmt.Printf("ID: %v\nName: %s\nNational: %s\n", user.ID, user.Name, user.National)
 
-			// return user.National, nil
+				// return user.National, nil
+			} else {
+				fmt.Printf("ID: %v\nName: %s\nNational: %s\n", cu.ID, cu.Name, cu.National)
+
+				// return cu.National, nil
+			}
+
 		}
 	}
 }
-
-// Start ( for{} получил в консоли имя - отдал национальность)
