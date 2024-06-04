@@ -14,7 +14,7 @@ func main() {
 
 	cl, err := nationalpredict.GetCountryList()
 	if err != nil {
-		log.Println("CountryList error:", err)
+		log.Panic("CountryList error:", err)
 	}
 
 	np := nationalpredict.New(cl, ns)

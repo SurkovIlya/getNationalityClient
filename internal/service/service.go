@@ -2,12 +2,11 @@ package service
 
 import (
 	"fmt"
+	"getNationalClient/internal/exception"
 	"getNationalClient/internal/model"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/pkg/cache"
-	"log"
 	"os"
-	"time"
 )
 
 type National interface {
@@ -21,7 +20,6 @@ type Service struct {
 
 func New(np *nationalpredict.NationalPredicter) *Service {
 	return &Service{
-
 		NationalPredicter: np,
 	}
 }
@@ -32,34 +30,34 @@ func (sv *Service) Start() (string, error) {
 	const ttlMs = 5
 	cacheUsers := cache.NewCash(uint32(ttlMs))
 	go cacheUsers.Clean()
-
+	exceptionMap := exception.ExpetionCheck()
 	for {
 		fmt.Fscan(os.Stdin, &user.Name)
-		if user.Name == "Владимир" {
-			user.National = "Slavic"
-			user.ID = uint32(time.Now().Unix())
-			fmt.Printf("ID: %v\nName: %s\nNational: Slavic\n", user.ID, user.Name)
-			// return "Slavic", nil
-		} else {
-			cu, err := cacheUsers.GetUserByName(user.Name)
-			if err != nil {
-				log.Println(err)
-				user.National, err = sv.NationalPredicter.GetNational(user)
-				if err != nil {
-					log.Println("Error find national:", err)
-					// return "", err
-				}
-				user.ID = uint32(time.Now().Unix())
-				cacheUsers.AddWord(user)
-				fmt.Printf("ID: %v\nName: %s\nNational: %s\n", user.ID, user.Name, user.National)
+		cacheUser, err := cacheUsers.GetCaheVal(user.Name)
+		if err == nil {
+			user = cacheUser
+			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
-				// return user.National, nil
-			} else {
-				fmt.Printf("ID: %v\nName: %s\nNational: %s\n", cu.ID, cu.Name, cu.National)
-
-				// return cu.National, nil
-			}
-
+			continue
+			// return user.National, nil
 		}
+		national, ok := exceptionMap[user.Name]
+		if ok {
+			user.National = national
+			cacheUsers.AddWord(user)
+			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+
+			continue
+			// return user.National, nil
+		}
+		user.National, err = sv.NationalPredicter.GetNational(user)
+		if err == nil {
+			cacheUsers.AddWord(user)
+			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+
+			continue
+			// return user.National, nil
+		}
+
 	}
 }

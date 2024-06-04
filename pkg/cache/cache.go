@@ -28,7 +28,7 @@ func NewCash(ttlMs uint32) *Cache {
 
 }
 
-func (c *Cache) GetUserByName(name string) (model.User, error) {
+func (c *Cache) GetCaheVal(name string) (model.User, error) {
 	if value, ok := c.Records[name]; ok {
 		value.Lastusedgetime = time.Now()
 		c.Records[name] = value
