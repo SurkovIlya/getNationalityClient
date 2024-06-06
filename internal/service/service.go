@@ -1,12 +1,10 @@
 package service
 
 import (
-	"fmt"
 	"getNationalClient/internal/exception"
 	"getNationalClient/internal/model"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/pkg/cache"
-	"os"
 )
 
 type National interface {
@@ -24,39 +22,40 @@ func New(np *nationalpredict.NationalPredicter) *Service {
 	}
 }
 
-func (sv *Service) Start() (string, error) {
+func (sv *Service) NationalName(name string) (string, error) {
 	var user model.User
+	user.Name = name
 	// var err error
 	const ttlMs = 5
 	cacheUsers := cache.NewCash(uint32(ttlMs))
 	go cacheUsers.Clean()
 	exceptionMap := exception.ExpetionCheck()
 	for {
-		fmt.Fscan(os.Stdin, &user.Name)
+		// fmt.Fscan(os.Stdin, &user.Name)
 		cacheUser, err := cacheUsers.GetCaheVal(user.Name)
 		if err == nil {
 			user = cacheUser
-			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+			// fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
-			continue
-			// return user.National, nil
+			// continue
+			return user.National, nil
 		}
 		national, ok := exceptionMap[user.Name]
 		if ok {
 			user.National = national
 			cacheUsers.AddWord(user)
-			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+			// fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
-			continue
-			// return user.National, nil
+			// continue
+			return user.National, nil
 		}
 		user.National, err = sv.NationalPredicter.GetNational(user)
 		if err == nil {
 			cacheUsers.AddWord(user)
-			fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
+			// fmt.Printf("Name: %s\nNational: %s\n", user.Name, user.National)
 
-			continue
-			// return user.National, nil
+			// continue
+			return user.National, nil
 		}
 
 	}
