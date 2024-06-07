@@ -34,6 +34,7 @@ func (sv *Service) NationalName(name string) (string, error) {
 
 	for {
 		// fmt.Fscan(os.Stdin, &user.Name)
+
 		cacheUser, err := cacheUsers.GetCaheVal(user.Name)
 		if err == nil {
 			user = cacheUser
@@ -43,6 +44,7 @@ func (sv *Service) NationalName(name string) (string, error) {
 			return user.National, nil
 		}
 		exception := sv.Exception.ExpetionCheck(name)
+
 		if exception.Name != "" {
 			user.Name = exception.Name
 			user.National = exception.National

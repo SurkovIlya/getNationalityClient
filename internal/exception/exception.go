@@ -1,5 +1,7 @@
 package exception
 
+import "log"
+
 type ExcentionPerson struct {
 	Name     string `json:"name"`
 	National string `json:"national"`
@@ -22,12 +24,12 @@ func New() *ExceptionStore {
 	}
 }
 
-// func (es *ExceptionStore) AddExcStore(exception ExcentionPerson) {
-// 	exceptionName = append(exceptionName, exception)
-// 	for _, person := range exceptionName {
-// 		es.ExceptionMap[person.Name] = person.National
-// 	}
-// }
+func (es *ExceptionStore) AddExcStore(exception ExcentionPerson) {
+	exceptionName = append(exceptionName, exception)
+	for _, person := range exceptionName {
+		es.ExceptionMap[person.Name] = person.National
+	}
+}
 
 func (es *ExceptionStore) ExpetionCheck(name string) ExcentionPerson {
 
@@ -38,6 +40,6 @@ func (es *ExceptionStore) ExpetionCheck(name string) ExcentionPerson {
 	}
 	expRespons.Name = name
 	expRespons.National = val
-
+	log.Printf(expRespons.Name, expRespons.National)
 	return expRespons
 }
