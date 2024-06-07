@@ -18,7 +18,8 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/national", h.GetNationalName)
+	mux.HandleFunc("GET /national", h.GetNationalName)
+	// mux.HandleFunc("/addexcention", h.AddExcention)
 
 	return mux
 }
@@ -39,3 +40,34 @@ func (h *Handler) GetNationalName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(answer)
 
 }
+
+// func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
+
+// 	type ResponseId struct {
+// 		Resp string `json:"resp"`
+// 	}
+
+// 	contentType := r.Header.Get("Content-Type")
+// 	mediatype, _, err := mime.ParseMediaType(contentType)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+
+// 		return
+// 	}
+// 	if mediatype != "application/json" {
+// 		http.Error(w, "expect application/json Content-Type", http.StatusUnsupportedMediaType)
+
+// 		return
+// 	}
+
+// 	dec := json.NewDecoder(r.Body)
+// 	dec.DisallowUnknownFields()
+// 	var rp exception.ExcentionPerson
+// 	if err := dec.Decode(&rp); err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+
+// 		return
+// 	}
+// 	h.services.Exception.AddExcStore(rp)
+// 	json.NewEncoder(w).Encode(&ResponseId{Resp: "1"})
+// }

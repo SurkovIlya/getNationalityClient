@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"getNationalClient/internal/exception"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/internal/nationalsource"
 	"getNationalClient/internal/service"
@@ -25,8 +26,9 @@ func main() {
 	}
 
 	np := nationalpredict.New(cl, ns)
+	exc := exception.New()
 
-	sv := service.New(np)
+	sv := service.New(np, exc)
 
 	// sv.NationalName()
 
