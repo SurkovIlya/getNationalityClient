@@ -25,8 +25,10 @@ func (np *NationalPredicter) GetNational(user model.User) (string, error) {
 	iso, err := np.NationalSource.GetNationalByName(user.Name)
 	if err != nil {
 		log.Println("GetNational error", err)
+
 		return "", err
 	}
 	national := np.CountryList[iso]
+
 	return national, nil
 }

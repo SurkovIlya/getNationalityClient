@@ -19,6 +19,7 @@ func New() *ExceptionStore {
 	for _, person := range exceptionName {
 		exceptionMap[person.Name] = person.National
 	}
+
 	return &ExceptionStore{
 		ExceptionMap: exceptionMap,
 	}
@@ -41,5 +42,6 @@ func (es *ExceptionStore) ExpetionCheck(name string) ExcentionPerson {
 	expRespons.Name = name
 	expRespons.National = val
 	log.Printf(expRespons.Name, expRespons.National)
+
 	return expRespons
 }

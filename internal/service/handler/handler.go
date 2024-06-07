@@ -71,5 +71,5 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.services.Exception.AddExcStore(rp)
-	json.NewEncoder(w).Encode(&ResponseId{Resp: "1"})
+	json.NewEncoder(w).Encode(&ResponseId{Resp: "OK"})
 }

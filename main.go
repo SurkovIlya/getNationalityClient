@@ -26,11 +26,10 @@ func main() {
 	}
 
 	np := nationalpredict.New(cl, ns)
+
 	exc := exception.New()
 
 	sv := service.New(np, exc)
-
-	// sv.NationalName()
 
 	handlers := handler.NewHandler(sv)
 

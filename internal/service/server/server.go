@@ -25,10 +25,3 @@ func (s *Server) Run(port string, handler http.Handler) error {
 func (s *Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
 }
-
-// func Server() {
-// 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-// 		fmt.Fprintf(w, "Hello World!")
-// 	})
-// 	http.ListenAndServe(":80", nil)
-// }
