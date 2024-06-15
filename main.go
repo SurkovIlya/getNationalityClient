@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"getNationalClient/internal/configs"
 	"getNationalClient/internal/exception"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/internal/nationalsource"
@@ -14,11 +15,12 @@ import (
 	"syscall"
 )
 
-const host = "https://api.nationalize.io"
-const port = "8080"
+// const host = "https://api.nationalize.io"
+// const port = "8080"
 
 func main() {
-	ns := nationalsource.New(host)
+	cfg := configs.New()
+	ns := nationalsource.New(cfg.StaticURL)
 
 	cl, err := nationalpredict.GetCountryList()
 	if err != nil {
@@ -36,12 +38,14 @@ func main() {
 	srv := new(server.Server)
 
 	go func() {
-		if err := srv.Run(port, handlers.InitRoutes()); err != nil {
+		if err := srv.Run(cfg.Port, handlers.InitRoutes()); err != nil {
 			log.Fatalf("error occured while running http server: %s", err.Error())
 		}
+
 	}()
 
 	log.Print("NationalServer Started")
+	cfg.Print()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
