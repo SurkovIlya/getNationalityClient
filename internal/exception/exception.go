@@ -1,7 +1,5 @@
 package exception
 
-import "log"
-
 type ExcentionPerson struct {
 	Name     string `json:"name"`
 	National string `json:"national"`
@@ -40,7 +38,6 @@ func (es *ExceptionStore) ExpetionCheck(name string) ExcentionPerson {
 	}
 	expRespons.Name = name
 	expRespons.National = val
-	log.Printf(expRespons.Name, expRespons.National)
 
 	return expRespons
 }

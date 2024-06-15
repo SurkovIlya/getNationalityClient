@@ -5,6 +5,7 @@ import (
 	"getNationalClient/internal/model"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/pkg/cache"
+	"time"
 )
 
 type National interface {
@@ -15,42 +16,45 @@ type Service struct {
 	National          National
 	NationalPredicter *nationalpredict.NationalPredicter
 	Exception         *exception.ExceptionStore
+	UserCache         *cache.Cache
 }
 
-func New(np *nationalpredict.NationalPredicter, exc *exception.ExceptionStore) *Service {
+func New(np *nationalpredict.NationalPredicter, exc *exception.ExceptionStore, cache *cache.Cache) *Service {
 	return &Service{
 		NationalPredicter: np,
 		Exception:         exc,
+		UserCache:         cache,
 	}
 }
 
-func (sv *Service) NationalName(name string) (string, error) {
+func (sv *Service) NationalName(name string) (model.User, error) {
 	var user model.User
 	user.Name = name
-	const ttlMs = 5
-	cacheUsers := cache.NewCash(uint32(ttlMs))
-	go cacheUsers.Clean()
+
+	go sv.UserCache.Clean()
 
 	for {
-		cacheUser, err := cacheUsers.GetCaheVal(user.Name)
+		cacheUser, err := sv.UserCache.GetCaheVal(user.Name)
 		if err == nil {
-			user = cacheUser
+			sv.UserCache.UpdRecord(cacheUser)
 
-			return user.National, nil
+			return cacheUser, nil
 		}
 		exception := sv.Exception.ExpetionCheck(name)
 		if exception.Name != "" {
 			user.Name = exception.Name
 			user.National = exception.National
-			cacheUsers.AddWord(user)
+			user.Lastusedgetime = time.Now()
+			sv.UserCache.AddRecodr(user)
 
-			return user.National, nil
+			return user, nil
 		}
 		user.National, err = sv.NationalPredicter.GetNational(user)
 		if err == nil {
-			cacheUsers.AddWord(user)
+			user.Lastusedgetime = time.Now()
+			sv.UserCache.AddRecodr(user)
 
-			return user.National, nil
+			return user, nil
 		}
 
 	}

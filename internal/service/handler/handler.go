@@ -29,12 +29,11 @@ func (h *Handler) InitRoutes() http.Handler {
 func (h *Handler) GetNationalName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var (
-		answer model.UserRespons
+		answer model.User
 		err    error
 	)
 	name := r.URL.Query().Get("name")
-	answer.Name = name
-	answer.National, err = h.services.NationalName(name)
+	answer, err = h.services.NationalName(name)
 	if err != nil {
 		json.NewEncoder(w).Encode(&model.User{})
 
