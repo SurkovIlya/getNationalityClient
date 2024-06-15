@@ -34,6 +34,7 @@ func (np *NationalSource) GetNationalByName(name string) (string, error) {
 	client := http.Client{
 		Timeout: 6 * time.Second,
 	}
+
 	resp, err := client.Get(url)
 	if err != nil {
 		panic(err)
@@ -61,6 +62,5 @@ func (np *NationalSource) GetNationalByName(name string) (string, error) {
 
 		return "", err
 	}
-
 	return apiResponse.Country[0].CountryID, nil
 }

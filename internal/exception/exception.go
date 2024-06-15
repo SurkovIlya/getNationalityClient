@@ -33,7 +33,6 @@ func (es *ExceptionStore) AddExcStore(exception ExcentionPerson) {
 }
 
 func (es *ExceptionStore) ExpetionCheck(name string) ExcentionPerson {
-
 	var expRespons ExcentionPerson
 	val, ok := es.ExceptionMap[name]
 	if !ok {
