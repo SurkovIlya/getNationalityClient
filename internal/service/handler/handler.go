@@ -7,6 +7,7 @@ import (
 	"getNationalClient/internal/service"
 	"mime"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
@@ -14,7 +15,6 @@ type Handler struct {
 }
 
 func NewHandler(services *service.Service) *Handler {
-
 	return &Handler{services: services}
 }
 
@@ -27,25 +27,33 @@ func (h *Handler) InitRoutes() http.Handler {
 }
 
 func (h *Handler) GetNationalName(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	w.Header().Set("Content-Type", "application/json")
 	var (
-		answer model.User
+		answer model.Answer
 		err    error
 	)
 	name := r.URL.Query().Get("name")
-	answer, err = h.services.NationalName(name)
+	answer.Result, err = h.services.NationalName(name)
 	if err != nil {
 		json.NewEncoder(w).Encode(&model.User{})
 
 		return
 	}
+	endTime := time.Now()
+	elepsedTime := endTime.Sub(startTime)
+	answer.Time = elepsedTime
+
 	json.NewEncoder(w).Encode(answer)
 }
 
 func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	w.Header().Set("Content-Type", "application/json")
-	type ResponseId struct {
-		Resp string `json:"resp"`
+
+	type Response struct {
+		Resp string        `json:"resp"`
+		Time time.Duration `json:"time"`
 	}
 
 	contentType := r.Header.Get("Content-Type")
@@ -69,6 +77,10 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 	h.services.Exception.AddExcStore(rp)
-	json.NewEncoder(w).Encode(&ResponseId{Resp: "OK"})
+	endTime := time.Now()
+	elepsedTime := endTime.Sub(startTime)
+
+	json.NewEncoder(w).Encode(&Response{Resp: "OK", Time: elepsedTime})
 }

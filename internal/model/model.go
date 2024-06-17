@@ -8,7 +8,7 @@ type User struct {
 	Lastusedgetime time.Time
 }
 
-type UserRespons struct {
-	Name     string `json:"name"`
-	National string `json:"national"`
+type Answer struct {
+	Result User          `json:"result"`
+	Time   time.Duration `json:"time"`
 }
