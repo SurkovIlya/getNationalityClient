@@ -53,8 +53,9 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	type Response struct {
-		Resp interface{} `json:"resp"`
-		Time string      `json:"time"`
+		Resp    string `json:"resp"`
+		Time    string `json:"time"`
+		Message string `json:"message"`
 	}
 
 	contentType := r.Header.Get("Content-Type")
@@ -79,11 +80,13 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	e := h.services.Exception.AddExcStore(rp)
+	er := h.services.Exception.AddExcStore(rp)
 	endTime := time.Now()
 	elepsedTime := endTime.Sub(startTime).String()
-	if e != nil {
-		json.NewEncoder(w).Encode(&Response{Resp: e, Time: elepsedTime})
+	if er != nil {
+		json.NewEncoder(w).Encode(&Response{Resp: http.StatusText(200), Time: elepsedTime, Message: er.Error()})
+
+		return
 	}
 
 	json.NewEncoder(w).Encode(&Response{Resp: http.StatusText(200), Time: elepsedTime})
