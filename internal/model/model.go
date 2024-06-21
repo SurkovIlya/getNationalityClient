@@ -9,6 +9,7 @@ type User struct {
 }
 
 type Answer struct {
-	Result User   `json:"result"`
+	Status string `json:"status"`
 	Time   string `json:"time"`
+	Result User   `json:"result"`
 }

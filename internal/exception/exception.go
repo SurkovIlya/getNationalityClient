@@ -2,6 +2,7 @@ package exception
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -48,11 +49,34 @@ func New() *ExceptionStore {
 	}
 }
 
-func (es *ExceptionStore) AddExcStore(exception ExceptionPerson) {
-	exceptionName = append(exceptionName, exception)
-	for _, person := range exceptionName {
-		es.ExceptionMap[person.Name] = person.National
+func (es *ExceptionStore) AddExcStore(exception ExceptionPerson) error {
+	file, err := os.Open("././data/exception.csv")
+	if err != nil {
+		log.Println("File exception.csv is not found:", err)
 	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+
+	defer writer.Flush()
+
+	exceptionData := []string{exception.Name, exception.National}
+	writer.Write(exceptionData)
+
+	if val, ok := es.ExceptionMap[exception.Name]; !ok {
+		es.ExceptionMap[exception.Name] = exception.National
+
+		return nil
+	} else if val == exception.National && ok {
+		err := errors.New("Исключение уже существует")
+		return err
+	} else if val != exception.National && ok {
+		es.ExceptionMap[exception.Name] = exception.National
+
+		return nil
+	}
+	err = errors.New("Добавление исключения невозможно! Обратитесь к разработчику")
+	return err
 }
 
 func (es *ExceptionStore) ExpetionCheck(name string) ExceptionPerson {

@@ -43,6 +43,7 @@ func (h *Handler) GetNationalName(w http.ResponseWriter, r *http.Request) {
 	endTime := time.Now()
 	elepsedTime := endTime.Sub(startTime)
 	answer.Time = elepsedTime.String()
+	answer.Status = http.StatusText(200)
 
 	json.NewEncoder(w).Encode(answer)
 }
@@ -52,8 +53,8 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	type Response struct {
-		Resp string `json:"resp"`
-		Time string `json:"time"`
+		Resp interface{} `json:"resp"`
+		Time string      `json:"time"`
 	}
 
 	contentType := r.Header.Get("Content-Type")
@@ -78,9 +79,12 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.services.Exception.AddExcStore(rp)
+	e := h.services.Exception.AddExcStore(rp)
 	endTime := time.Now()
 	elepsedTime := endTime.Sub(startTime).String()
+	if e != nil {
+		json.NewEncoder(w).Encode(&Response{Resp: e, Time: elepsedTime})
+	}
 
-	json.NewEncoder(w).Encode(&Response{Resp: "OK", Time: elepsedTime})
+	json.NewEncoder(w).Encode(&Response{Resp: http.StatusText(200), Time: elepsedTime})
 }
