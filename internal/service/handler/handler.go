@@ -71,7 +71,7 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
-	var rp exception.ExcentionPerson
+	var rp exception.ExceptionPerson
 	if err := dec.Decode(&rp); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 
