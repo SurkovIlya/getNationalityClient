@@ -22,6 +22,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /national", h.GetNationalName)
 	mux.HandleFunc("POST /addexcention", h.AddExcention)
+	mux.HandleFunc("POST /delexception", h.DelExcention)
 
 	return mux
 }
@@ -81,6 +82,50 @@ func (h *Handler) AddExcention(w http.ResponseWriter, r *http.Request) {
 	}
 
 	er := h.services.Exception.AddExcStore(rp)
+	endTime := time.Now()
+	elepsedTime := endTime.Sub(startTime).String()
+	if er != nil {
+		json.NewEncoder(w).Encode(&Response{Resp: http.StatusText(200), Time: elepsedTime, Message: er.Error()})
+
+		return
+	}
+
+	json.NewEncoder(w).Encode(&Response{Resp: http.StatusText(200), Time: elepsedTime})
+}
+
+func (h *Handler) DelExcention(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
+	w.Header().Set("Content-Type", "application/json")
+
+	type Response struct {
+		Resp    string `json:"resp"`
+		Time    string `json:"time"`
+		Message string `json:"message"`
+	}
+
+	contentType := r.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+	if mediatype != "application/json" {
+		http.Error(w, "expect application/json Content-Type", http.StatusUnsupportedMediaType)
+
+		return
+	}
+
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
+	var rp exception.ExceptionPerson
+	if err := dec.Decode(&rp); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	er := h.services.Exception.DelException(rp.Name)
 	endTime := time.Now()
 	elepsedTime := endTime.Sub(startTime).String()
 	if er != nil {

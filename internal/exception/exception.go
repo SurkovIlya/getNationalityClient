@@ -70,7 +70,6 @@ func (es *ExceptionStore) AddExcStore(exception ExceptionPerson) error {
 
 		return nil
 	} else if val == exception.National && ok {
-
 		return fmt.Errorf("исключение уже существует")
 	} else if val != exception.National && ok {
 		es.ExceptionMap[exception.Name] = exception.National
@@ -105,13 +104,53 @@ func (es *ExceptionStore) AddExcStore(exception ExceptionPerson) error {
 		}
 
 		write.WriteAll(record)
-
 		write.Flush()
 
 		return nil
 	}
 
 	return fmt.Errorf("добавление исключения невозможно! Обратитесь к разработчику")
+}
+
+func (es *ExceptionStore) DelException(name string) error {
+	if _, ok := es.ExceptionMap[name]; !ok {
+		return fmt.Errorf("удаление невозможно: для имени %v нет исключений", name)
+	}
+	delete(es.ExceptionMap, name)
+
+	file, err := os.Open("././data/exception.csv")
+	if err != nil {
+		log.Println("File exception.csv is not found:", err)
+
+		return fmt.Errorf("удаление исключения невозможно! Обратитесь к разработчику")
+	}
+	defer file.Close()
+
+	read := csv.NewReader(file)
+
+	record, err := read.ReadAll()
+	if err != nil {
+		return fmt.Errorf("удаление исключения невозможно! Обратитесь к разработчику")
+	}
+
+	fileNew, err := os.Create("././data/exception.csv")
+	if err != nil {
+		return fmt.Errorf("удаление исключения невозможно! Обратитесь к разработчику")
+	}
+	defer fileNew.Close()
+
+	write := csv.NewWriter(fileNew)
+
+	for i, value := range record {
+		if value[0] == name {
+			record = append(record[:i], record[i+1:]...)
+		}
+	}
+
+	write.WriteAll(record)
+	write.Flush()
+
+	return nil
 }
 
 func (es *ExceptionStore) ExpetionCheck(name string) ExceptionPerson {
