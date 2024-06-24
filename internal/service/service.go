@@ -1,10 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"getNationalClient/internal/exception"
 	"getNationalClient/internal/model"
 	"getNationalClient/internal/nationalpredict"
 	"getNationalClient/pkg/cache"
+	"log"
 	"time"
 )
 
@@ -29,33 +31,37 @@ func New(np *nationalpredict.NationalPredicter, exc *exception.ExceptionStore, c
 
 func (sv *Service) NationalName(name string) (model.User, error) {
 	var user model.User
+	var err error
 	user.Name = name
 
 	go sv.UserCache.Clean()
 
-	for {
-		cacheUser, err := sv.UserCache.GetCaheVal(user.Name)
-		if err == nil {
-			sv.UserCache.UpdRecord(cacheUser)
+	user, err = sv.UserCache.GetCaheVal(user.Name)
+	if err == nil {
+		sv.UserCache.UpdRecord(user)
 
-			return cacheUser, nil
-		}
-		exception := sv.Exception.ExpetionCheck(name)
-		if exception.Name != "" {
-			user.Name = exception.Name
-			user.National = exception.National
-			user.Lastusedgetime = time.Now()
-			sv.UserCache.AddRecodr(user)
-
-			return user, nil
-		}
-		user.National, err = sv.NationalPredicter.GetNational(user)
-		if err == nil {
-			user.Lastusedgetime = time.Now()
-			sv.UserCache.AddRecodr(user)
-
-			return user, nil
-		}
-
+		return user, nil
 	}
+
+	exception := sv.Exception.ExpetionCheck(name)
+	if exception.Name != "" {
+		user.Name = exception.Name
+		user.National = exception.National
+		user.Lastusedgetime = time.Now()
+		sv.UserCache.AddRecodr(user)
+
+		return user, nil
+	}
+
+	user.National, err = sv.NationalPredicter.GetNational(user)
+	if err != nil {
+		log.Println("It is impossible to get is National:", err)
+
+		return model.User{}, fmt.Errorf("невозможно получить национальность! Попробуйте изменить запрос")
+	}
+
+	user.Lastusedgetime = time.Now()
+	sv.UserCache.AddRecodr(user)
+
+	return user, nil
 }

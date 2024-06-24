@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"getNationalClient/internal/auth"
 	"getNationalClient/internal/configs"
 	"getNationalClient/internal/exception"
 	"getNationalClient/internal/nationalpredict"
@@ -35,7 +36,9 @@ func main() {
 
 	sv := service.New(np, exc, cache)
 
-	handlers := handler.NewHandler(sv)
+	au := auth.NewAuth()
+
+	handlers := handler.NewHandler(sv, au)
 
 	srv := new(server.Server)
 
