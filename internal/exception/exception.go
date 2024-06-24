@@ -130,11 +130,15 @@ func (es *ExceptionStore) DelException(name string) error {
 
 	record, err := read.ReadAll()
 	if err != nil {
+		log.Println("Could not read file:", err)
+
 		return fmt.Errorf("удаление исключения невозможно! Обратитесь к разработчику")
 	}
 
 	fileNew, err := os.Create("././data/exception.csv")
 	if err != nil {
+		log.Println("Failed to create a file:", err)
+
 		return fmt.Errorf("удаление исключения невозможно! Обратитесь к разработчику")
 	}
 	defer fileNew.Close()

@@ -9,7 +9,25 @@ type User struct {
 }
 
 type Answer struct {
-	Status string `json:"status"`
-	Time   string `json:"time"`
-	Result User   `json:"result"`
+	Status  string      `json:"status"`
+	Time    string      `json:"time"`
+	Result  interface{} `json:"result"`
+	Message string      `json:"message"`
+}
+
+type Auth struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+type Reg struct {
+	Name     string `json:"name"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+type UserData struct {
+	Name  string `json:"name"`
+	Login string `json:"login"`
+	Hash  []byte `json:"hash"`
 }
